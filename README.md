@@ -1,14 +1,7 @@
-# clj-pearls
+# Pearls of Functional Algorithm Design in Clojure
 
-A Clojure library designed to ... well, that part is up to you.
+A clojure library containing algorithms from [Pearls of Functional Algorithm
+Design](https://www.amazon.com/dp/0521513383)
 
-## Usage
-
-FIXME
-
-## License
-
-Copyright © 2018 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Currently implemented:
+1. The smallest free number
