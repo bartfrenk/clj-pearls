@@ -20,3 +20,8 @@
             t gen/int]
       (let [pred (partial < t)]
         (= [(filter pred xs) (remove pred xs)] (sut/separate pred xs)))))
+
+
+(deftest maximum-surpasser-count-test
+  (testing "GENERATING example from the book"
+    (is (= 6 (sut/maximum-surpasser-count (map int "GENERATING"))))))
