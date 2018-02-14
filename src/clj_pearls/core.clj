@@ -56,10 +56,57 @@
       (join (- m n) (table ys) (table zs)))))
 
 (defn maximum-surpasser-count
-  "Returns the maximum surpasser count of the numerical list `xs`."
+  "Returns the maximum surpasser count of the numerical list `xs`. The surpasser
+  count of an element of a list are the number of greater elements to the right
+  of it."
   [xs]
   {:pre [(not (empty? xs))]}
   (apply max (map second (table xs))))
 
 
-(not (empty? []))
+(defn invert
+  "Finds all pairs of natural numbers that are mapped to `z` by `g`, under the
+  assumption that `g` is strictly increasing in both arguments."
+  ([f z] (invert [0 z] f z))
+  ([[u v] f z]
+   (let [z* (f [u v])]
+     (cond
+       (or (> u z) (neg? v)) ()
+       (< z* z) (invert [(inc u) v] f z)
+       (= z* z) (cons [u v] (invert [(inc u) (dec v)] f z))
+       (> z* z) (invert [u (dec v)] f z)))))
+
+(defn bsearch
+  "Finds a natural number m in the interval [a, b) such that z is in the
+  interval [g m, g (m + 1)), in time logarithmic in the length of the interval."
+  [g [a b] z]
+  (let [m (quot (+ a b) 2)]
+    (cond
+      (= (inc a) b) a
+      (<= (g m) z) (recur g [m b] z)
+      :else (recur g [a m] z))))
+
+(defn invert-tail-recursive
+  "Tail-recursive variant of invert."
+  ([f z] (invert-tail-recursive () [0 z] f z))
+  ([acc [u v] f z]
+   (let [z* (f [u v])]
+     (cond
+       (or (> u z) (neg? v)) acc
+       (< z* z) (recur acc [(inc u) v] f z)
+       (= z* z) (recur (cons [u v] acc) [(inc u) (dec v)] f z)
+       (> z* z) (recur acc [u (dec v)] f z)))))
+
+(defn invert-bounded
+  "Variant of `invert` that bounds the search space."
+  ([f z]
+   (let [m (bsearch (fn [y] (if (neg? y) (f [0 0]) (f [0 y]))) [-1 (inc z)] z)
+         n (bsearch (fn [x] (if (neg? x) (f [0 0]) (f [x 0]))) [-1 (inc z)] z)]
+     (loop [acc ()
+            [u v] [0 m]]
+       (let [z* (f [u v])]
+         (cond
+           (or (> u n) (neg? v)) acc
+           (< z* z) (recur acc [(inc u) v])
+           (= z* z) (recur (cons [u v] acc) [(inc u) (dec v)])
+           (> z* z) (recur acc [u (dec v)])))))))

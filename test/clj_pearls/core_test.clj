@@ -25,3 +25,39 @@
 (deftest maximum-surpasser-count-test
   (testing "GENERATING example from the book"
     (is (= 6 (sut/maximum-surpasser-count (map int "GENERATING"))))))
+
+
+(defn bounded-nat
+  [n]
+  (gen/fmap #(mod % n) gen/pos-int))
+
+
+(defn are-inverses-prop
+  [invert-fn test-fn]
+  (for-all [z (bounded-nat 1000)]
+      (let [coll (invert-fn test-fn z)]
+        (every? true?
+                (for [p coll]
+                  (= z (test-fn p)))))))
+
+(defn f3
+  [[x y]] (+ (* x x) (* y y) x y))
+
+(defn m
+  [[u v]] (* (inc u) (inc v)))
+
+(defspec invert-bounded-returns-inverses-f3-spec
+    100
+    (are-inverses-prop sut/invert-bounded f3))
+
+(defspec invert-bounded-returns-inverses-m-spec
+    100
+    (are-inverses-prop sut/invert-bounded m))
+
+(defspec invert-tail-recursive-returns-inverses-f3-spec
+    100
+    (are-inverses-prop sut/invert-tail-recursive f3))
+
+(defspec invert-tail-recursive-returns-inverses-m-spec
+    100
+    (are-inverses-prop sut/invert-tail-recursive m))
